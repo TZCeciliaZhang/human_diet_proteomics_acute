@@ -16,7 +16,7 @@ df3<-data.frame(names(df2),t(df2))
 names(df3)<-c("ID",as.matrix(names(df3[,-1])))
 df4<-merge(info,df3,by.x = "ID")
 
-#确定主题##############
+
 theme="A"
 gee<-data.frame(names(df4[,-c(1:8)]))
 i=9
@@ -32,7 +32,7 @@ for (i in 9:891){
                 subset = (diet == theme))
 
   a<-as.data.frame((summary(geeglm3))[[6]])
-  #n记得修改！！！
+ 
   gee_time2<-a$`Pr(>|W|)`[2]
   gee_time2<-as.numeric(gee_time2)
   padj_time2=p.adjust(gee_time2,method = 'BH',n=883)
