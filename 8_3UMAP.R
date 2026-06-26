@@ -6,7 +6,7 @@ library(umap)
 library(ggsci)
 library(ggplot2)
 library(Rtsne)
-#设定颜色差异较大的颜色
+
 colpalettes<-unique(c(pal_npg("nrc")(10),pal_aaas("default")(10),pal_nejm("default")(8),pal_lancet("lanonc")(9),
                       pal_jama("default")(7),pal_jco("default")(10),pal_ucscgb("default")(26),pal_d3("category10")(10),
                       pal_locuszoom("default")(7),pal_igv("default")(51),
