@@ -1,4 +1,4 @@
-# 加载所需的包
+
 library(clusterProfiler)
 library(org.Hs.eg.db)
 library(GOplot)
@@ -11,17 +11,15 @@ library(ggplot2)
 library(ggpubr)
 library(gridExtra)
 
-# 创建输出目录
+
 dirname <- "20240728enrichplot"
 dir.create(dirname)
 
-# 读取数据
 
-# 加载必要的包
 library(dplyr)
-library(readr)  # 如果使用read_csv函数读取CSV文件
+library(readr)  
 
-# 定义文件路径及对应的饮食标签
+
 file_paths <- list(
   "Result_gee_lgFC/A_gee_lgFC0.26_sel.csv" = "A",
   "Result_gee_lgFC/B_gee_lgFC0.26_sel.csv" = "B",
@@ -30,24 +28,23 @@ file_paths <- list(
   "Result_gee_lgFC/E_gee_lgFC0.26_sel.csv" = "E"
 )
 
-# 读取每个文件并添加饮食列
+
 data_list <- lapply(names(file_paths), function(file) {
   diet_label <- file_paths[[file]]
-  df <- read_csv(file) %>%  # 或使用 read.csv(file) 取决于你的文件格式
+  df <- read_csv(file) %>% 
     mutate(diet = diet_label)
   return(df)
 })
 
-# 合并所有数据
+
 dep <- bind_rows(data_list)
 
-# 保存合并结果到一个新文件
-write_csv(dep, "dep_diet.csv")  # 或使用 write.csv(combined_data, "combined_data.csv", row.names = FALSE)
+
+write_csv(dep, "dep_diet.csv") 
 
 
 
 
-# 计算不同饮食中的差异蛋白质数据
 library(readr)
 dep <- read_csv("dep_diet.csv")
 calculate_diff_proteins <- function(data, diet_label) {
@@ -83,12 +80,12 @@ library(dplyr)
 library(clusterProfiler)
 library(org.Hs.eg.db)
 
-# 定义一个函数来转换 UNIPROT 到 SYMBOL
+
 convert_uniprot_to_symbol <- function(data) {
   uniprot_ids <- unique(data$UNIPROT)
   uniprot_to_symbol <- bitr(uniprot_ids, fromType = "UNIPROT", toType = "SYMBOL", OrgDb = org.Hs.eg.db)
   
-  # 合并基因符号到数据框
+
   data <- data %>%
     left_join(uniprot_to_symbol, by = c("UNIPROT" = "UNIPROT")) %>%
     rename(SYMBOL = SYMBOL)
@@ -96,7 +93,7 @@ convert_uniprot_to_symbol <- function(data) {
   return(data)
 }
 
-# 批量转换 UNIPROT 到 SYMBOL
+
 diff_proteins_high_glucose <- convert_uniprot_to_symbol(diff_proteins_high_glucose)
 diff_proteins_ketogenic <- convert_uniprot_to_symbol(diff_proteins_ketogenic)
 diff_proteins_hfhc <- convert_uniprot_to_symbol(diff_proteins_hfhc)
@@ -105,7 +102,7 @@ diff_proteins_normal <- convert_uniprot_to_symbol(diff_proteins_normal)
 
 
 
-# 合并所有饮食的差异蛋白质数据
+
 all_diff_proteins <- bind_rows(
   mutate(diff_proteins_high_glucose, diet = "High Glucose"),
   mutate(diff_proteins_ketogenic, diet = "Ketogenic"),
@@ -114,7 +111,7 @@ all_diff_proteins <- bind_rows(
   mutate(diff_proteins_normal, diet = "Normal")
 )
 
-# 可视化
+
 library(ggplot2)
 
 # Define custom colors
@@ -147,11 +144,10 @@ print(p)
 ggsave(paste0(dirname, "/urine.tiff"), plot = p, width = 8, height = 6, dpi = 300)
 
 
-###人数据####################################################
-# 读取数据
+
 dep <- read.csv("D:/Cycy1/R_Proj/Diet/diet_R/diet_dep.csv")
 
-# 计算不同饮食中的差异蛋白质数据
+
 calculate_diff_proteins <- function(data, diet_label) {
   sel <- data[data$diet == diet_label, ]
   diff_proteins <- sel %>%
@@ -178,7 +174,7 @@ diff_proteins_LFLC <- calculate_diff_proteins(dep, "E")
 diff_proteins_normal <- calculate_diff_proteins(dep, "D")
 
 
-# 合并所有饮食的差异蛋白质数据
+
 plasma_data <- bind_rows(
   mutate(diff_proteins_high_glucose, diet = "High Glucose"),
   mutate(diff_proteins_ketogenic, diet = "Ketogenic"),
@@ -188,18 +184,18 @@ plasma_data <- bind_rows(
 )
 
 
-# 过滤出基因符号一致的数据
+
 filtered_urine_data <- all_diff_proteins %>%
   filter(SYMBOL %in% plasma_data$SYMBOL)
 
 filtered_plasma_data <- plasma_data %>%
   filter(SYMBOL %in% filtered_urine_data$SYMBOL)
 
-# 查看过滤后的数据
+
 print(filtered_urine_data)
 print(filtered_plasma_data)
 
-# 为了可视化，将过滤后的尿液和等离子数据合并
+
 comparison_data <- filtered_urine_data %>%
   select(SYMBOL, logFC.urine = logFC, pvalue.urine = pvalue, diet.urine = diet) %>%
   inner_join(
@@ -207,7 +203,7 @@ comparison_data <- filtered_urine_data %>%
     by = "SYMBOL"
   )
 
-# 将尿液和等离子的数据分别作为单独的行添加到一个新的data frame中
+
 urine_plot_data <- comparison_data %>%
   select(SYMBOL, logFC = logFC.urine, pvalue = pvalue.urine, diet = diet.urine) %>%
   mutate(type = "urine")
@@ -218,7 +214,7 @@ plasma_plot_data <- comparison_data %>%
 
 plot_data <- bind_rows(urine_plot_data, plasma_plot_data)
 
-# 可视化尿液和等离子之间的logFC相关性，使用不同的点形状来表示不同的类型
+
 # Define custom colors
 custom_colors <- c("High Glucose" = "darkblue", "HFHC" = "#ff7f0e", "LFLC" = "#2ca02c", "Ketogenic" = "#d62728","Normal"="lightblue")
 p2 <- ggplot(plot_data, aes(x = SYMBOL, y = logFC, color = diet, shape = type)) +
@@ -250,12 +246,6 @@ ggsave(paste0(dirname, "/urine_plasma1.tiff"), plot = p2, width = 6, height = 6,
 
 
 
-
-# 进行富集分析
-
-
-
-# 计算不同饮食中的差异蛋白质数据
 library(readr)
 dep <- read_csv("dep_diet.csv")
 calculate_diff_proteins <- function(data, diet_label) {
@@ -289,12 +279,12 @@ library(dplyr)
 library(clusterProfiler)
 library(org.Hs.eg.db)
 
-# 定义一个函数来转换 UNIPROT 到 SYMBOL
+
 convert_uniprot_to_symbol <- function(data) {
   uniprot_ids <- unique(data$UNIPROT)
   uniprot_to_symbol <- bitr(uniprot_ids, fromType = "UNIPROT", toType = "SYMBOL", OrgDb = org.Hs.eg.db)
   
-  # 合并基因符号到数据框
+
   data <- data %>%
     left_join(uniprot_to_symbol, by = c("UNIPROT" = "UNIPROT")) %>%
     rename(SYMBOL = SYMBOL)
@@ -302,7 +292,7 @@ convert_uniprot_to_symbol <- function(data) {
   return(data)
 }
 
-# 批量转换 UNIPROT 到 SYMBOL
+
 diff_proteins_high_glucose <- convert_uniprot_to_symbol(diff_proteins_high_glucose)
 diff_proteins_ketogenic <- convert_uniprot_to_symbol(diff_proteins_ketogenic)
 diff_proteins_hfhc <- convert_uniprot_to_symbol(diff_proteins_hfhc)
@@ -328,7 +318,7 @@ enrich_hfhc <- perform_enrichment(diff_proteins_hfhc$SYMBOL)
 enrich_LFLC <- perform_enrichment(diff_proteins_LFLC$SYMBOL)
 enrich_normal <- perform_enrichment(diff_proteins_normal$SYMBOL)
 
-# 选择显著通路
+
 extract_significant_pathways <- function(enrich_result, diet_name) {
   significant_pathways <- enrich_result@result %>%
     filter(p.adjust < 0.05) %>%
@@ -342,20 +332,20 @@ significant_hfhc <- extract_significant_pathways(enrich_hfhc, "HFHC")
 significant_LFLC <- extract_significant_pathways(enrich_LFLC, "LFLC")
 significant_normal <- extract_significant_pathways(enrich_normal, "Normal")
 
-# 合并结果
+
 combined_results <- bind_rows(significant_high_glucose, significant_ketogenic, significant_hfhc, significant_LFLC, significant_normal)
 
-# 共同变化的通路
+
 common_pathways <- Reduce(intersect, list(significant_high_glucose$Description, significant_ketogenic$Description, significant_hfhc$Description, significant_LFLC$Description, significant_normal$Description))
 
-# 不同变化的通路
+
 unique_high_glucose <- setdiff(significant_high_glucose$Description, c(significant_ketogenic$Description, significant_hfhc$Description, significant_LFLC$Description, significant_normal$Description))
 unique_ketogenic <- setdiff(significant_ketogenic$Description, c(significant_high_glucose$Description, significant_hfhc$Description, significant_LFLC$Description, significant_normal$Description))
 unique_hfhc <- setdiff(significant_hfhc$Description, c(significant_high_glucose$Description, significant_ketogenic$Description, significant_LFLC$Description, significant_normal$Description))
 unique_LFLC <- setdiff(significant_LFLC$Description, c(significant_high_glucose$Description, significant_ketogenic$Description, significant_hfhc$Description, significant_normal$Description))
 unique_normal <- setdiff(significant_normal$Description, c(significant_high_glucose$Description, significant_ketogenic$Description, significant_hfhc$Description, significant_LFLC$Description))
 
-# 提取前5个共同变化的通路
+
 top_common_pathways <- combined_results %>%
   filter(Description %in% common_pathways) %>%
   arrange(pvalue) %>%
@@ -363,12 +353,12 @@ top_common_pathways <- combined_results %>%
   head(5) %>%
   pull(Description)
 
-# 提取共同变化的通路数据并按 pvalue 排序选择前5种
+
 common_results <- combined_results %>%
   filter(Description %in% top_common_pathways) %>%
   mutate(Category = "Common")
 
-# 提取不同变化的通路数据并按 pvalue 排序选择前5种
+
 unique_high_glucose_results <- combined_results %>%
   filter(Description %in% unique_high_glucose) %>%
   arrange(pvalue) %>%
@@ -394,10 +384,10 @@ unique_LFLC_results <- combined_results %>%
   mutate(Category = "Unique to LFLC")
 
 
-# 合并共同变化和不同变化的结果
+
 plot_data <- bind_rows(common_results, unique_high_glucose_results, unique_ketogenic_results, unique_hfhc_results, unique_LFLC_results)
 
-# 创建一个包含所有数据的ggplot
+
 plot <- ggplot(plot_data, aes(x = Diet, y = reorder(Description, pvalue), size = Count, color = -log10(p.adjust))) +
   geom_point() +
   scale_color_gradient(low = "blue", high = "red") +
@@ -418,10 +408,10 @@ plot <- ggplot(plot_data, aes(x = Diet, y = reorder(Description, pvalue), size =
   ) +
   facet_wrap(~Category, scales = "free_y", ncol = 1)
 
-# 保存图像
+
 ggsave(paste0(dirname,"/diet_comparison.tiff"), plot, width = 10, height = 15)
 
-# 绘制共同通路的 cnetplot
+
 common_result <- enrich_high_glucose
 common_result@result <- enrich_high_glucose@result %>%
   filter(Description %in% common_pathways) %>%
@@ -432,7 +422,7 @@ cnet_common <- cnetplot(common_result, showCategory = 5) +
   ggtitle("Common Pathways") + 
   theme_minimal()
 
-# 绘制 High-glucose 特有通路的 cnetplot
+
 unique_high_glucose_result <- enrich_high_glucose
 unique_high_glucose_result@result <- enrich_high_glucose@result %>% 
   filter(Description %in% unique_high_glucose) %>% 
@@ -449,7 +439,7 @@ cnet_high_glucose <- cnetplot(unique_high_glucose_result, showCategory = 5) +
     legend.text = element_text(size = 12)
   )
 
-# 绘制 Ketogenic 特有通路的 cnetplot
+
 unique_ketogenic_result <- enrich_ketogenic
 unique_ketogenic_result@result <- enrich_ketogenic@result %>% 
   filter(Description %in% unique_ketogenic) %>% 
@@ -466,7 +456,7 @@ cnet_ketogenic <- cnetplot(unique_ketogenic_result, showCategory = 5) +
     legend.text = element_text(size = 12)
   )
 
-# 绘制 HFHC 特有通路的 cnetplot
+
 unique_hfhc_result <- enrich_hfhc
 unique_hfhc_result@result <- enrich_hfhc@result %>% 
   filter(Description %in% unique_hfhc) %>% 
@@ -483,7 +473,7 @@ cnet_hfhc <- cnetplot(unique_hfhc_result, showCategory = 5) +
     legend.text = element_text(size = 12)
   )
 
-# 绘制 LFLC 特有通路的 cnetplot
+
 unique_LFLC_result <- enrich_LFLC
 unique_LFLC_result@result <- enrich_LFLC@result %>% 
   filter(Description %in% unique_LFLC) %>% 
