@@ -23,7 +23,7 @@ clinical=lgFC_clinical
 s2e <- bitr(rownames(combat), 
             fromType = "UNIPROT",
             toType = "SYMBOL",
-            OrgDb = org.Hs.eg.db)#人类
+            OrgDb = org.Hs.eg.db)
 
 
 combat2=combat
