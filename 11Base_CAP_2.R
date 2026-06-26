@@ -13,20 +13,18 @@ LFD<-read.csv(paste0("Result_gee_lgFC/E_gee_lgFC",theme1,"_sel.csv"))
 
 
 
-#Ttest####################
-#所有批次的空腹
 
 theme2="1"
-#定义A-1
+
 label_diet <- clinical$diet[match(colnames(combat),clinical$ID)]
 label_time <- clinical$time[match(colnames(combat),clinical$ID)]
 
 data=combat[,which(label_time==theme2)]
-#合并clinical和lab表格
+
 clinical2=clinical[clinical$time==theme2,]
 lab2=merge(lab,clinical2,by="bianhao")
 
-#实验组和对照组
+
 theme3="cap238"
 library(tidyverse)
 lab3=lab2 %>%  mutate(cap_group = if_else(lab2$cap>238,true = "high",false = "normal"))
@@ -61,16 +59,16 @@ k2 = (dep$P_value< P.Value_t)&(dep$fd > logFC_t)#上调
 dep <- mutate(dep,change = ifelse(k1,"down",ifelse(k2,"up","stable")))
 
 dep$protein=rownames(dep)
-#改名字
+
 
 library(clusterProfiler)
 library(org.Hs.eg.db)
 s2e <- bitr(dep$protein, 
             fromType = "UNIPROT",
             toType = "SYMBOL",
-            OrgDb = org.Hs.eg.db)#人类
+            OrgDb = org.Hs.eg.db)
 colnames(s2e)[1]="protein"
-#有重复！！！
+
 s2e=s2e[!duplicated(s2e$protein),]
 dep_2=merge(dep,s2e)
 dep_2$newname=paste0(dep_2$protein,"_",dep_2$SYMBOL)
