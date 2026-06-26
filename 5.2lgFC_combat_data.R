@@ -5,13 +5,12 @@ library(RColorBrewer)
 library(tidyverse)
 df2=combat
 
-#####################
-#定义Label
+
 label_diet <- clinical$diet[match(colnames(combat),clinical$ID)]
 label_time <- clinical$time[match(colnames(combat),clinical$ID)]
 label_bianhao <- clinical$bianhao[match(colnames(combat),clinical$ID)]
 
-#OGTT-log2(foldchange)计算
+
 theme="A"
 df8 <- df2
 df8[is.na(df8)]<-0
@@ -42,7 +41,7 @@ colnames(df8)[ncol(df8)]<-paste0("Time5_",theme,i)}
 
 df9=df8[,526:ncol(df8)]
 
-#Keto-log2(foldchange)计算
+
 theme="B"
 df8 <- df2
 df8[is.na(df8)]<-0
@@ -74,7 +73,7 @@ for (i in 2:24) {
 df10=df8[,526:ncol(df8)]
 
 
-#HFD-log2(foldchange)计算
+
 theme="C"
 df8 <- df2
 df8[is.na(df8)]<-0
@@ -106,7 +105,7 @@ for (i in 2:24) {
 df11=df8[,526:ncol(df8)]
 
 
-#Normal-log2(foldchange)计算
+
 theme="D"
 df8 <- df2
 df8[is.na(df8)]<-0
@@ -137,7 +136,7 @@ for (i in 2:24) {
 
 df12=df8[,526:ncol(df8)]
 
-#LFD-log2(foldchange)计算
+
 theme="E"
 df8 <- df2
 df8[is.na(df8)]<-0
@@ -173,7 +172,7 @@ df14=cbind(df9,df10,df11,df12,df13)
 lgFC_combat=df14
 save(lgFC_combat,file = "lgFC_combat_FDRnotsel_remove36_NA80_sek.Rdata")
 
-#lgFC_clinical表格
+
 lgFC_clinical<-as.data.frame(colnames(lgFC_combat))
 colnames(lgFC_clinical)="ID2"
 lgFC_clinical$time=substr(lgFC_clinical$ID2,5,5)
