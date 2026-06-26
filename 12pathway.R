@@ -217,7 +217,7 @@ cnet_LFLC <- cnetplot(unique_LFLC_result, showCategory = 5) +
   theme_minimal()
 
 
-# Example of setting explicit dimensions in ggplot2
+
 combined_cnetplot <- grid.arrange(cnet_common, cnet_high_glucose, cnet_ketogenic, cnet_hfhc, cnet_LFLC, nrow=1)
 
 
