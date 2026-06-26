@@ -105,7 +105,7 @@ ht <- Heatmap(
   column_names_rot = 30  
 )
 
-# 保存热图到文件
+
 tiff(paste0(dirname,"/oxidation-heatmap.tiff"), res = 300, width = 1000, height = 800)  
 draw(ht, heatmap_legend_side = "right")      
 dev.off()                                  
