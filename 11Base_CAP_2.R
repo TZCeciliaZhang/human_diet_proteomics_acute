@@ -54,8 +54,8 @@ dep<-df8[,(ncol(df8)-2):ncol(df8)]
 
 logFC_t=0.26
 P.Value_t = 0.05
-k1 = (dep$P_value< P.Value_t)&(dep$fd < -logFC_t)#下调
-k2 = (dep$P_value< P.Value_t)&(dep$fd > logFC_t)#上调
+k1 = (dep$P_value< P.Value_t)&(dep$fd < -logFC_t)
+k2 = (dep$P_value< P.Value_t)&(dep$fd > logFC_t)
 dep <- mutate(dep,change = ifelse(k1,"down",ifelse(k2,"up","stable")))
 
 dep$protein=rownames(dep)
