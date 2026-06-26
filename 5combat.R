@@ -7,7 +7,7 @@ library("stringr")
 library("tidyverse")
 
 
-###临床表格前处理（with36和without36版本）----
+
 {clinical<-read.csv("sample_batch_list.csv",check.names=F,row.names=1)
 save(clinical,file="sample_batch_list.Rdata")
 
@@ -16,7 +16,7 @@ clinical<-clinical[-grep("batch36",rownames(clinical)),]
 save(clinical,file="sample_batch_list_remove36.Rdata")}
 
 
-###test1:未删除36，NA80，用0替代----
+
 
 load("diet_FDRnotsel_NA80_rep0.Rdata")
 load("sample_batch_list.Rdata")
@@ -30,9 +30,8 @@ combat<-as.data.frame(combat_diet_data)
 
 save(combat,file="combat_FDRnotsel_NA80_rep0.Rdata")
 
-#可视化1(PCA的偷懒画法)，最后决定删batch36
+
 { 
-  #校正前PCA
   colpalettes<-unique(c(pal_igv("default")(51)))
   
   load("sample_batch_list.Rdata")
@@ -50,7 +49,7 @@ save(combat,file="combat_FDRnotsel_NA80_rep0.Rdata")
   pca.plot
   dev.off()
   
-  #校正后PCA
+ 
   colpalettes<-unique(c(pal_igv("default")(51)))
   
   load("sample_batch_list.Rdata")
@@ -66,7 +65,7 @@ save(combat,file="combat_FDRnotsel_NA80_rep0.Rdata")
                       color.label = "Group")
   pca.plot
   dev.off()}
-#可视化2(PCA的基础画法：只画PCA_after)
+
 {load("diet_data_afterNA.Rdata")
   load("combat_diet_data.Rdata")
   sample_batch_list<-read.csv("sample_batch_list.csv",check.names=F,row.names=1)
@@ -94,7 +93,7 @@ save(combat,file="combat_FDRnotsel_NA80_rep0.Rdata")
 
 
 
-###test2:删除36，NA0----
+
 load("diet_FDRnotsel_remove36_NA0.Rdata")
 load("sample_batch_list_remove36.Rdata")
 
@@ -110,7 +109,7 @@ save(combat,file="combat_FDRnotsel_remove36_NA0.Rdata")
 
 
 
-###test3:删除36，NA80,NAguide impseqrob插补----
+
 load("diet_FDRnotsel_remove36_NAguide_NA80_imp.Rdata")
 load("sample_batch_list_remove36.Rdata")
 
@@ -125,7 +124,7 @@ save(combat,file="combat_FDRnotsel_remove36_NA80_imp.Rdata")
 
 
 
-###test4:删除36，NA70,NAguide sek插补----
+
 load("diet_FDRnotsel_remove36_NAguide_NA70_sek.Rdata")
 load("sample_batch_list_remove36.Rdata")
 
@@ -140,7 +139,7 @@ save(combat,file="combat_FDRnotsel_remove36_NA70_sek.Rdata")
 
 
 
-###test5:删除36，NA80,NAguide sek插补----
+
 load("diet_FDRnotsel_remove36_NAguide_NA80_sek.Rdata")
 load("sample_batch_list_remove36.Rdata")
 
