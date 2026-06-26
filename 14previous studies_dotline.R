@@ -12,38 +12,38 @@ library(org.Hs.eg.db)
 Proj="Previous studies-dotline graph"
 dirname=paste0("Fig-202310-",Proj)
 dir.create(dirname)
-#导入数据(lgFC版本)
+
 load("D:/Cycy1/R_Proj/Diet/diet_R/lgFC_combat_FDRnotsel_remove36_NA80_sek.Rdata")
 load("D:/Cycy1/R_Proj/Diet/diet_R/lgFC_sample_batch_list_remove36.Rdata")
 
 combat=lgFC_combat
 clinical=lgFC_clinical
 
-#加SYMBOL列
+
 s2e <- bitr(rownames(combat), 
             fromType = "UNIPROT",
             toType = "SYMBOL",
             OrgDb = org.Hs.eg.db)#人类
 
-# 表达矩阵行名替换
+
 combat2=combat
 combat2$UNIPROT=rownames(combat2)
-combat3 <- merge(combat2,s2e)#两个数据
+combat3 <- merge(combat2,s2e)
 combat4=combat3[!duplicated(combat3$SYMBOL),]
 combat5=combat4[,-1]
 rownames(combat5)=combat5$SYMBOL
 
-#选择差异基因！！！！
+
 target_protein=c("CRP","ORM1","ORM2","APOA5","PRDX1","PRDX2","THBS1","CAT","CA1","CA2","S100A4","S100A7")
 s2e=s2e[s2e$SYMBOL%in%target_protein,]
 colnames(s2e)=c("protein","SYMBOL")
 
-###画图
+
 data=combat5
 for (i in 1:nrow(s2e)){
   protein<-s2e$protein[i]
   symbol=s2e$SYMBOL[i]
-  #修改文件名！！！！！！
+
   theme7<-paste0(protein,"_",symbol)
   data2=data[symbol,]
   
