@@ -90,12 +90,12 @@ pheatmap(rho_df, color=colorRampPalette(c('blue','white','red'))(200),
 #   geom_tile(aes(fill=spearman),color='black') +
 #   geom_text(aes(label=p), color="black", size=4, vjust=0.7) + 
 #   scale_fill_gradient2(low='blue', high='red',mid = 'white', limit=c(-1,1), name="Correlation") + 
-#   labs(x=NULL,y=NULL) + # 去掉横纵坐标标题
+#   labs(x=NULL,y=NULL) + 
 #   theme(axis.text.x = element_text(size=8,angle = 30,hjust = 1,color = "black"),
 #         axis.text.y = element_text(size=8,color = "black"),
 #         axis.ticks.x = element_blank(),
 #         axis.ticks.y = element_blank(),
-#         panel.background=element_blank()) # 做一些简单的美化
+#         panel.background=element_blank())
 
 dev.off()
 
@@ -476,12 +476,12 @@ dev.off()
 #   geom_tile(aes(fill=spearman),color='black') +
 #   geom_text(aes(label=p), color="black", size=4, vjust=0.7) + 
 #   scale_fill_gradient2(low='blue', high='red',mid = 'white', limit=c(-1,1), name="Correlation") + 
-#   labs(x=NULL,y=NULL) + # 去掉横纵坐标标题
+#   labs(x=NULL,y=NULL) + 
 #   theme(axis.text.x = element_text(size=8,angle = 30,hjust = 1,color = "black"),
 #         axis.text.y = element_text(size=8,color = "black"),
 #         axis.ticks.x = element_blank(),
 #         axis.ticks.y = element_blank(),
-#         panel.background=element_blank()) # 做一些简单的美化
+#         panel.background=element_blank())
 
 # dev.off()
 
@@ -916,13 +916,13 @@ process_ABCED_data <- function(abc_data_path, trans_file, physiological_file, ou
             'PRDX2','S100A7','ORM1','MIF',
             'S100A4','CRP','CA1','FLNA')
   
-  # 处理trans数据
+
   trans2 = trans[trans$Gene %in% genes,]
   df = common_combat_urine[rownames(common_combat_urine) %in% trans2$From,]
   df = df[,grep('^A',colnames(df))]
   rownames(df) = trans$Gene[match(rownames(df),trans$From)]
   
-  # 处理physiological数据
+
   physiological = read_xls(physiological_file)
   physiological$Serialnumber = sprintf('%02d', physiological$Serialnumber)
   physiological$Time = sprintf('%02d', physiological$Time)
@@ -931,11 +931,11 @@ process_ABCED_data <- function(abc_data_path, trans_file, physiological_file, ou
   physiological = t(physiological[,c('GLU','insulin','TG','FFA')])
   colnames(physiological) = colnames(df)
   
-  # 转置数据
+ 
   df = t(df)
   physiological = t(physiological)
   
-  # 计算Spearman相关系数
+
   rho_df = data.frame()
   p_df = data.frame()
   
@@ -950,15 +950,15 @@ process_ABCED_data <- function(abc_data_path, trans_file, physiological_file, ou
   p_df = as.matrix(p_df)
   p_df = ifelse(p_df < 0.05, '*', '')
   
-  # 按字母从A-Z排序行名
+
   rownames(rho_df) = sort(rownames(rho_df))
   rownames(p_df) = sort(rownames(p_df))
   
-  # 确保行名排序的一致性
+
   rho_df = rho_df[rownames(rho_df), ]
   p_df = p_df[rownames(p_df), ]
   
-  # 绘制热图
+
   pdf(output_pdf)
   pheatmap(rho_df, color=colorRampPalette(c('blue','white','red'))(200),
            cellwidth=15, cellheight=15, cluster_rows=F, scale='none',
@@ -967,7 +967,7 @@ process_ABCED_data <- function(abc_data_path, trans_file, physiological_file, ou
   dev.off()
 }
 
-# 使用示例
+
 process_ABCED_data("combat_urine_FDRnotsel_NA80_omitb36_seqknn_sample.Rdata", 
                    "ID_trans.xlsx", 
                    'clinical_data_A.xls', 
@@ -976,11 +976,11 @@ process_ABCED_data("combat_urine_FDRnotsel_NA80_omitb36_seqknn_sample.Rdata",
 #############################################
 library(readxl)
 library(pheatmap)
-library(foreign)  # 用于读取.sav文件
+library(foreign)  
 
-# 定义处理BCDE数据的函数
+
 process_BCDE_data <- function(abc_data_path, trans_file, physiological_file, output_pdf) {
-  # 加载数据
+
   load(abc_data_path)
   trans = read_xlsx(trans_file)
   genes = c('FTH1','PF4V1','RAP1B','LMNA',
@@ -990,13 +990,13 @@ process_BCDE_data <- function(abc_data_path, trans_file, physiological_file, out
             'PRDX2','S100A7','ORM1','MIF',
             'S100A4','CRP','CA1','FLNA')
   
-  # 处理trans数据
+  
   trans2 = trans[trans$Gene %in% genes,]
   df = common_combat_urine[rownames(common_combat_urine) %in% trans2$From,]
   df = df[, grep('^B', colnames(df))]
   rownames(df) = trans$Gene[match(rownames(df), trans$From)]
   
-  # 处理physiological数据
+
   physiological = read.spss(physiological_file, to.data.frame = TRUE)
   physiological$SerialNumber = sprintf('%02d', as.numeric(physiological$SerialNumber))
   physiological$Time = sprintf('%02d', physiological$Time)
@@ -1005,11 +1005,11 @@ process_BCDE_data <- function(abc_data_path, trans_file, physiological_file, out
   physiological = t(physiological[, c('GLU', 'insulin', 'TG', 'FFA')])
   colnames(physiological) = colnames(df)
   
-  # 转置数据
+
   df = t(df)
   physiological = t(physiological)
-  
-  # 计算Spearman相关系数
+
+          
   rho_df = data.frame()
   p_df = data.frame()
   
@@ -1024,12 +1024,12 @@ process_BCDE_data <- function(abc_data_path, trans_file, physiological_file, out
   p_df = as.matrix(p_df)
   p_df = ifelse(p_df < 0.05, '*', '')
   
-  # 按字母从A到E排序行名
+
   sorted_row_names = sort(rownames(rho_df))
   rho_df = rho_df[sorted_row_names, ]
   p_df = p_df[sorted_row_names, ]
   
-  # 绘制热图
+
   pdf(output_pdf)
   pheatmap(rho_df, color=colorRampPalette(c('blue', 'white', 'red'))(200),
            cellwidth=15, cellheight=15, cluster_rows=FALSE, scale='none',
@@ -1038,13 +1038,13 @@ process_BCDE_data <- function(abc_data_path, trans_file, physiological_file, out
   dev.off()
 }
 
-# 使用示例
+
 process_BCDE_data("combat_urine_FDRnotsel_NA80_omitb36_seqknn_sample.Rdata", 
                   "ID_trans.xlsx", 
                   'clinical_data_B.sav', 
                   "urine_B.pdf")
 
-# 使用示例
+
 process_BCDE_data("combat_urine_FDRnotsel_NA80_omitb36_seqknn_sample.Rdata", 
                   "ID_trans.xlsx", 
                   'clinical_data_C.sav', 
@@ -1052,11 +1052,11 @@ process_BCDE_data("combat_urine_FDRnotsel_NA80_omitb36_seqknn_sample.Rdata",
 
 library(readxl)
 library(pheatmap)
-library(foreign)  # 用于读取.sav文件
+library(foreign) 
 
-# 定义处理D和E数据的函数
+
 process_DE_data <- function(abc_data_path, trans_file, physiological_file, output_pdf, dataset_letter) {
-  # 加载数据
+
   load(abc_data_path)
   trans = read_xlsx(trans_file)
   genes = c('FTH1','PF4V1','RAP1B','LMNA',
@@ -1066,13 +1066,13 @@ process_DE_data <- function(abc_data_path, trans_file, physiological_file, outpu
             'PRDX2','S100A7','ORM1','MIF',
             'S100A4','CRP','CA1','FLNA')
   
-  # 处理trans数据
+
   trans2 = trans[trans$Gene %in% genes,]
   df = common_combat_urine[rownames(common_combat_urine) %in% trans2$From,]
   df = df[, grep(paste0('^', dataset_letter), colnames(df))]
   rownames(df) = trans$Gene[match(rownames(df), trans$From)]
   
-  # 处理physiological数据
+
   physiological = read.spss(physiological_file, to.data.frame = TRUE)
   physiological$serialnumber = sprintf('%02d', as.numeric(physiological$serialnumber))
   physiological$Time = sprintf('%02d', physiological$Time)
@@ -1081,19 +1081,19 @@ process_DE_data <- function(abc_data_path, trans_file, physiological_file, outpu
   physiological = t(physiological[, c('GLU', 'insulin', 'TG', 'FFA')])
   colnames(physiological) = colnames(df)
   
-  # 转置数据
+
   df = t(df)
   physiological = t(physiological)
   
-  # 计算Spearman相关系数
+
   rho_df = data.frame()
   p_df = data.frame()
   
   for (i in colnames(df)) {
     for (j in colnames(physiological)) {
-      # 删除含有NA的行
+
       valid_data = na.omit(data.frame(df[, i], physiological[, j]))
-      if (nrow(valid_data) >= 2) {  # 至少需要2个有效值来计算相关系数
+      if (nrow(valid_data) >= 2) { 
         result = cor.test(valid_data[, 1], valid_data[, 2], method = 'spearman')
         rho_df[i, j] = result$estimate["rho"]
         p_df[i, j] = result$p.value
@@ -1108,12 +1108,12 @@ process_DE_data <- function(abc_data_path, trans_file, physiological_file, outpu
   p_df = as.matrix(p_df)
   p_df = ifelse(is.na(p_df), '', ifelse(p_df < 0.05, '*', ''))
   
-  # 按字母从A到E排序行名
+
   sorted_row_names = sort(rownames(rho_df))
   rho_df = rho_df[sorted_row_names, ]
   p_df = p_df[sorted_row_names, ]
   
-  # 绘制热图
+
   pdf(output_pdf)
   pheatmap(rho_df, color=colorRampPalette(c('blue', 'white', 'red'))(200),
            cellwidth=15, cellheight=15, cluster_rows=FALSE, scale='none',
@@ -1122,7 +1122,7 @@ process_DE_data <- function(abc_data_path, trans_file, physiological_file, outpu
   dev.off()
 }
 
-# 使用示例
+
 process_DE_data("combat_urine_FDRnotsel_NA80_omitb36_seqknn_sample.Rdata", 
                 "ID_trans.xlsx", 
                 'clinical_data_D.sav', 
@@ -1131,11 +1131,11 @@ process_DE_data("combat_urine_FDRnotsel_NA80_omitb36_seqknn_sample.Rdata",
 
 library(readxl)
 library(pheatmap)
-library(foreign)  # 用于读取.sav文件
+library(foreign)  
 
-# 定义处理E数据的函数
+
 process_E_data <- function(abc_data_path, trans_file, physiological_file, output_pdf) {
-  # 加载数据
+  
   load(abc_data_path)
   trans = read_xlsx(trans_file)
   genes = c('FTH1','PF4V1','RAP1B','LMNA',
@@ -1145,26 +1145,26 @@ process_E_data <- function(abc_data_path, trans_file, physiological_file, output
             'PRDX2','S100A7','ORM1','MIF',
             'S100A4','CRP','CA1','FLNA')
   
-  # 处理trans数据
+ 
   trans2 = trans[trans$Gene %in% genes,]
   df = common_combat_urine[rownames(common_combat_urine) %in% trans2$From,]
   df = df[, grep('^E', colnames(df))]
   rownames(df) = trans$Gene[match(rownames(df), trans$From)]
   
-  # 处理physiological数据
+
   physiological = read.spss(physiological_file, to.data.frame = TRUE)
   physiological$Serialnumber = sprintf('%02d', as.numeric(physiological$Serialnumber))
   physiological$Time = sprintf('%02d', physiological$Time)
   physiological$BH = paste0('EBH', physiological$Serialnumber, 'SJ', physiological$Time)
   
-  # 打印检查数据
+
   print("physiological BH column:")
   print(head(physiological$BH))
   
-  # 确保数据匹配
+
   physiological = physiological[match(colnames(df), physiological$BH),]
   
-  # 确保数据完整性
+
   if (any(is.na(physiological))) {
     print("Warning: NA values detected in physiological data")
   }
@@ -1172,19 +1172,19 @@ process_E_data <- function(abc_data_path, trans_file, physiological_file, output
   physiological = t(physiological[, c('GLU', 'insulin', 'TG', 'FFA')])
   colnames(physiological) = colnames(df)
   
-  # 转置数据
+ 
   df = t(df)
   physiological = t(physiological)
   
-  # 计算Spearman相关系数
+
   rho_df = data.frame()
   p_df = data.frame()
   
   for (i in colnames(df)) {
     for (j in colnames(physiological)) {
-      # 删除含有NA的行
+
       valid_data = na.omit(data.frame(df[, i], physiological[, j]))
-      if (nrow(valid_data) >= 2) {  # 至少需要2个有效值来计算相关系数
+      if (nrow(valid_data) >= 2) {  
         result = cor.test(valid_data[, 1], valid_data[, 2], method = 'spearman')
         rho_df[i, j] = result$estimate["rho"]
         p_df[i, j] = result$p.value
@@ -1199,12 +1199,12 @@ process_E_data <- function(abc_data_path, trans_file, physiological_file, output
   p_df = as.matrix(p_df)
   p_df = ifelse(is.na(p_df), '', ifelse(p_df < 0.05, '*', ''))
   
-  # 按字母从A到E排序行名
+
   sorted_row_names = sort(rownames(rho_df))
   rho_df = rho_df[sorted_row_names, ]
   p_df = p_df[sorted_row_names, ]
   
-  # 绘制热图
+
   pdf(output_pdf)
   pheatmap(rho_df, color=colorRampPalette(c('blue', 'white', 'red'))(200),
            cellwidth=15, cellheight=15, cluster_rows=FALSE, scale='none',
@@ -1213,7 +1213,7 @@ process_E_data <- function(abc_data_path, trans_file, physiological_file, output
   dev.off()
 }
 
-# 使用示例
+
 process_E_data("combat_urine_FDRnotsel_NA80_omitb36_seqknn_sample.Rdata", 
                "ID_trans.xlsx", 
                'clinical_data_E.sav', 
