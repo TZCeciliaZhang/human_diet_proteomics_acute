@@ -17,9 +17,9 @@ df2=lgFC_combat
 df3<-data.frame(names(df2),t(df2))
 names(df3)<-c("ID2",as.matrix(names(df3[,-1])))
 df4<-merge(info,df3,by.x = "ID2")
-#选择饮食A
+
 df5<-df4[which(df4$diet=="E"),]
-#分组求均值
+
 df6<-aggregate(df5[,colnames(df5)[7:ncol(df5)]],by=list(df5$time),mean,na.rm= TRUE)
 row.names(df6)<-c(as.matrix((df6[,1])))
 df7<-data.frame(t(df6[,-1]))
@@ -67,7 +67,7 @@ for (K in 1:4) {
     anova[c(i-1),3]<-padj
   }
   names(anova)<-c('protein',"pvalue","padj")
-  #因为padj太大，所以选了pvalue
+
   anova2<-data.frame(anova[c(which(anova$pvalue<=0.05)),])
   write.csv(anova2,paste0("lgFC_E_Time_protein_mfuzz_ge2021type_4/",K,"_mfuzz_anova_0.05.csv"),row.names = F)
 }
