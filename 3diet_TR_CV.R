@@ -1,4 +1,4 @@
-rm(list = ls())#清空环境变量
+rm(list = ls())
 
 library("readxl")
 library("tidyverse")
