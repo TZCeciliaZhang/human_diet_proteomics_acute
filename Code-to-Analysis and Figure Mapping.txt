@@ -1,0 +1,784 @@
+Code-to-Analysis and Figure Mapping
+===================================
+
+Project title:
+Proteomic profiling of acute postprandial responses to five single-meal challenges and implications for cardiometabolic health
+
+Repository:
+https://github.com/TZCeciliaZhang/human_diet_proteomics_acute
+
+Purpose of this document:
+This document maps each analysis script in the repository to the corresponding
+data-processing step, statistical analysis, figure, table, or supplementary
+analysis reported in the manuscript. The scripts are written in R and were
+developed to support the processing, analysis, visualization, and interpretation
+of the plasma and urinary proteomics data.
+
+Software:
+- R version: 4.3.2
+- Main statistical framework: generalized estimating equations (GEE)
+- Batch correction: ComBat implemented in the sva package
+- Functional enrichment: Metascape
+- Mendelian randomization: TwoSampleMR and MendelianRandomization
+- Visualization: R-based plotting and heatmap functions
+
+General analysis workflow:
+1. Quality control and coefficient-of-variation assessment
+2. Data organization and merging
+3. Calculation of log2 fold changes and batch correction
+4. Exploratory dimensionality reduction and temporal clustering
+5. GEE-based differential protein analysis
+6. Baseline phenotype analysis
+7. Pathway and functional enrichment analysis
+8. ASCVD-related protein visualization
+9. Comparison with previously reported studies
+10. Exploratory urinary proteomic pathway analysis
+
+
+----------------------------------------------------------------------
+1. 1diet_pool_CV.R
+----------------------------------------------------------------------
+
+Primary purpose:
+Quality-control analysis of pooled proteomics data and calculation of
+coefficient of variation (CV) across pooled samples or quality-control samples.
+
+Related analyses:
+- Assessment of analytical reproducibility
+- Evaluation of proteomics measurement precision
+- Calculation and visualization of CV distributions
+
+Related manuscript content:
+- Plasma and urine proteomics quality-control assessment
+- Statement regarding the median CV of approximately 3% for plasma and 5% for
+  urine proteomic data
+
+Related figures/tables:
+- Supports the quality-control results reported in Figure S1B and Figure S1C,
+  where applicable.
+- May also support supplementary quality-control tables, if generated.
+
+Expected outputs:
+- CV summary statistics
+- CV distribution plots
+- Quality-control figures for plasma and/or urine proteomic datasets
+
+Input data:
+- Pooled or quality-control proteomics data
+- Sample annotation and batch information
+
+Output files:
+- CV statistics
+- Quality-control plots
+- Intermediate files used in subsequent batch-effect assessment
+
+
+----------------------------------------------------------------------
+2. 2diet_batch_CV.R
+----------------------------------------------------------------------
+
+Primary purpose:
+Assessment of batch-specific variation in the proteomic data.
+
+Related analyses:
+- Calculation of CV across analytical batches
+- Comparison of proteomic data quality between batches
+- Identification of potential batch-related variation before correction
+
+Related manuscript content:
+- Proteomics quality-control assessment
+- Evaluation of batch effects before ComBat correction
+
+Related figures/tables:
+- Supports supplementary quality-control results, including Figure S1B and
+  Figure S1C, where applicable.
+
+Expected outputs:
+- Batch-level CV summaries
+- Batch comparison plots
+- Diagnostic plots showing between-batch variation
+
+Input data:
+- Proteomic intensity or abundance matrices
+- Batch annotation files
+- Sample metadata
+
+
+----------------------------------------------------------------------
+3. 3diet_TR_CV.R
+----------------------------------------------------------------------
+
+Primary purpose:
+Assessment of technical reproducibility and technical replicate variation.
+
+Related analyses:
+- Technical replicate comparison
+- Calculation of technical-replicate CV
+- Assessment of consistency between repeated measurements
+
+Related manuscript content:
+- Proteomics measurement reproducibility
+- Quality-control evaluation of the plasma and urinary proteomics datasets
+
+Related figures/tables:
+- Supports supplementary quality-control analyses, including Figure S1B and
+  Figure S1C, where applicable.
+
+Expected outputs:
+- Technical replicate CV statistics
+- Reproducibility plots
+- Quality-control summaries used to evaluate data reliability
+
+Input data:
+- Technical replicate proteomics data
+- Sample and replicate annotations
+
+
+----------------------------------------------------------------------
+4. 4Merge_ratio_step1.R
+----------------------------------------------------------------------
+
+Primary purpose:
+First-stage merging and organization of proteomic data and sample metadata.
+
+Related analyses:
+- Initial merging of proteomic intensity matrices
+- Integration of sample identifiers, dietary intervention labels, time points,
+  participant identifiers, and biological specimen types
+- Preparation of data for downstream normalization and statistical analysis
+
+Related manuscript content:
+- Preparation of the complete plasma and urine proteomic datasets
+- Organization of baseline and postprandial samples
+
+Related figures/tables:
+- Supports all downstream figures and tables that use the merged proteomic
+  dataset.
+
+Expected outputs:
+- First-stage merged proteomic data matrix
+- Harmonized sample annotation file
+- Intermediate dataset for further processing
+
+Input data:
+- Raw or preprocessed proteomic data
+- Sample metadata
+- Diet, participant, time-point, and biofluid annotations
+
+
+----------------------------------------------------------------------
+5. 4Merge_ratio_step2.R
+----------------------------------------------------------------------
+
+Primary purpose:
+Second-stage merging, data restructuring, and preparation of the analysis-ready
+proteomic dataset.
+
+Related analyses:
+- Completion of data merging
+- Restructuring of the dataset into analysis-ready format
+- Alignment of baseline and postprandial measurements
+- Preparation of diet-specific and time-specific data matrices
+
+Related manuscript content:
+- Data preparation for plasma and urine proteomic analyses
+- Preparation of data used for the five-meal crossover comparisons
+
+Related figures/tables:
+- Supports all downstream statistical analyses, including Figures 1–5 and
+  Tables S2–S6.
+
+Expected outputs:
+- Final merged analysis dataset
+- Diet- and time-point-specific data matrices
+- Analysis-ready metadata files
+
+
+----------------------------------------------------------------------
+6. 5.2lgFC_combat_data.R
+----------------------------------------------------------------------
+
+Primary purpose:
+Calculation of log2 fold changes and preparation of batch-corrected data.
+
+Related analyses:
+- Calculation of postprandial log2 fold changes relative to baseline
+- Preparation of diet-specific fold-change matrices
+- Formatting of data for downstream differential analysis and visualization
+
+Related manuscript content:
+- Postprandial fold-change analyses
+- Between-diet comparison of protein responses
+- Calculation of changes used in area-under-the-curve analyses
+
+Related figures/tables:
+- Supports Figure 1B–D
+- Supports Figure 2A–C
+- Supports Figure 3B
+- Supports Figure 4C–D
+- Supports Figure 5C
+- Supports Tables S2–S6
+
+Expected outputs:
+- Log2 fold-change matrices
+- Baseline-normalized protein expression data
+- Data files for downstream statistical testing and visualization
+
+Input data:
+- Merged proteomic data
+- Baseline and postprandial sample annotations
+- Diet and participant information
+
+
+----------------------------------------------------------------------
+7. 5combat.R
+----------------------------------------------------------------------
+
+Primary purpose:
+Correction and assessment of proteomic batch effects using ComBat.
+
+Related analyses:
+- Batch-effect correction using the sva package
+- Comparison of data before and after batch correction
+- Preparation of corrected plasma and urine proteomic datasets
+
+Related manuscript content:
+- Batch-effect correction described in the Results section
+- Statement that the ComBat method was used to mitigate potential batch effects
+
+Related figures/tables:
+- Figure S1D
+- Figure S1E
+- Additional supplementary batch-effect diagnostic plots, where applicable
+
+Expected outputs:
+- Batch-corrected proteomic matrices
+- Before-and-after correction plots
+- Corrected datasets used in downstream analyses
+
+Input data:
+- Merged proteomic matrices
+- Batch labels
+- Sample metadata
+
+
+----------------------------------------------------------------------
+8. 6UMAP.R
+----------------------------------------------------------------------
+
+Primary purpose:
+Exploratory dimensionality-reduction analysis using Uniform Manifold
+Approximation and Projection (UMAP).
+
+Related analyses:
+- Visualization of global sample structure
+- Assessment of clustering by biofluid, batch, diet, time point, or participant
+- Evaluation of the effect of batch correction on sample-level structure
+
+Related manuscript content:
+- Exploratory proteomic data structure and quality assessment
+- Assessment of sample clustering and potential batch effects
+
+Related figures/tables:
+- Supports supplementary UMAP visualizations, where applicable.
+- May support Figure S1D–E or other supplementary quality-control figures,
+  depending on the final figure assembly.
+
+Expected outputs:
+- UMAP coordinates
+- Two-dimensional sample-clustering plots
+- Plots before and/or after batch correction
+
+Input data:
+- Raw or batch-corrected proteomic matrices
+- Sample-level metadata
+
+
+----------------------------------------------------------------------
+9. 7mfuzz_lgFC.R
+----------------------------------------------------------------------
+
+Primary purpose:
+Temporal clustering of postprandial protein-response trajectories using
+log2 fold-change data and soft clustering.
+
+Related analyses:
+- Identification of groups of proteins with similar temporal response patterns
+- Characterization of early, intermediate, and late postprandial responses
+- Visualization of protein-expression trajectories across 0.5, 1, 2, and
+  3 hours after each meal
+
+Related manuscript content:
+- Time-resolved proteomic response patterns
+- Exploration of meal-specific postprandial trajectories
+
+Related figures/tables:
+- Supports supplementary temporal-response figures, where applicable.
+- May support the interpretation of Figure 1B–D and Figure 2A–B.
+
+Expected outputs:
+- Soft-clustering assignments
+- Cluster-specific temporal profiles
+- Heatmaps and trajectory plots
+- Lists of proteins assigned to each temporal cluster
+
+Input data:
+- Baseline-normalized log2 fold-change matrices
+- Protein identifiers
+- Diet and time-point annotations
+
+
+----------------------------------------------------------------------
+10. 8GEE.R
+----------------------------------------------------------------------
+
+Primary purpose:
+Identification of differentially expressed proteins using generalized estimating
+equations (GEE).
+
+Related analyses:
+- Modeling of repeated measurements within participants
+- Assessment of postprandial changes over time
+- Identification of differentially expressed proteins for each meal
+- Application of the study criteria:
+  - Benjamini–Hochberg FDR < 0.05
+  - Absolute log2 fold change > 0.26
+
+Related manuscript content:
+- Primary statistical analysis of acute plasma proteomic responses
+- Identification of differentially expressed proteins following:
+  - High-glucose challenge/OGTT
+  - Ketogenic meal
+  - HFHC meal
+  - NFNC meal
+  - LFLC meal
+
+Related figures/tables:
+- Figure 1B: Number of differentially expressed plasma proteins at each
+  postprandial time point
+- Figure 1C–D: Proteins commonly altered across the five interventions
+- Figure 2A–B: Between-diet proteomic comparisons
+- Figure 3B: Postprandial TGM2 response
+- Figure 4A–B: Baseline protein comparisons, where applicable
+- Tables S2–S6: Diet-specific differentially expressed proteins
+
+Expected outputs:
+- GEE model results
+- Protein-specific effect estimates
+- P values and FDR-adjusted P values
+- Lists of differentially expressed proteins
+- Time-specific and diet-specific statistical results
+
+Input data:
+- Batch-corrected proteomic data
+- Participant identifiers
+- Diet and time-point information
+- Baseline and postprandial sample annotations
+
+
+----------------------------------------------------------------------
+11. 9Base_CAP.R
+----------------------------------------------------------------------
+
+Primary purpose:
+Baseline phenotype analysis focusing on controlled attenuation parameter (CAP),
+hepatic steatosis, metabolic phenotypes, and baseline plasma protein levels.
+
+Related analyses:
+- Comparison of baseline protein levels by BMI category
+- Comparison of baseline proteins between participants with and without hepatic
+  steatosis
+- Integration of proteomic data with CAP and related metabolic measurements
+- Identification of inflammation- and metabolism-related baseline protein
+  signatures
+
+Related manuscript content:
+- Baseline proteomic differences between normal-weight and overweight/obese
+  participants
+- Baseline proteomic differences between participants with and without hepatic
+  steatosis
+- Analysis of proteins such as CRP, LILRA3, SERPINE1, ADIPOQ, ORM1, ORM2,
+  HLA-A, PPIA, PGM1, ALDOB, and IDH1
+
+Related figures/tables:
+- Figure 4A: Baseline plasma protein differences by BMI category
+- Figure 4B: Baseline plasma protein differences by hepatic steatosis status
+- Figure S4A, where applicable
+
+Expected outputs:
+- Baseline differential protein results
+- CAP- and phenotype-related protein associations
+- Volcano plots, heatmaps, and summary tables
+
+Input data:
+- Baseline plasma proteomic data
+- BMI category
+- CAP and liver stiffness measurements
+- Clinical and biochemical phenotype data
+
+
+----------------------------------------------------------------------
+12. 10pathway.R
+----------------------------------------------------------------------
+
+Primary purpose:
+Functional and pathway enrichment analysis of diet-responsive plasma proteins.
+
+Related analyses:
+- Enrichment analysis of differentially expressed proteins
+- Identification of Gene Ontology, KEGG, Reactome, and related biological
+  processes
+- Clustering of enriched terms based on shared genes or proteins
+- Preparation of pathway-level summaries for diet-specific comparisons
+
+Related manuscript content:
+- Enrichment of pathways related to:
+  - Inflammation
+  - Oxidative stress
+  - Lipid metabolism
+  - Platelet activation
+  - Endothelial-related processes
+  - Cytoskeletal organization
+  - Cell adhesion
+
+Related figures/tables:
+- Figure 2A–C
+- Supplementary pathway figures, including Figures S2A–B, where applicable
+- Supplementary pathway tables, where applicable
+
+Expected outputs:
+- Enriched pathway lists
+- Adjusted P values
+- Enrichment factors
+- Pathway clusters
+- Dot plots, network plots, and pathway summaries
+
+Input data:
+- Differentially expressed protein lists
+- Official human gene symbols
+- Background protein or gene list
+- Diet- and time-specific statistical results
+
+
+----------------------------------------------------------------------
+13. 11ASCVDheatmap.R
+----------------------------------------------------------------------
+
+Primary purpose:
+Generation of heatmaps showing diet-responsive proteins and their relationships
+with atherosclerotic cardiovascular disease (ASCVD)-relevant pathways.
+
+Related analyses:
+- Visualization of key diet-responsive plasma proteins
+- Integration of protein changes with cardiovascular-relevant biological
+  processes
+- Comparison of the direction and magnitude of responses across meals
+
+Related manuscript content:
+- Diet-specific proteomic signatures relevant to cardiovascular and
+  cardiometabolic biology
+- Visualization of proteins involved in inflammation, oxidative stress, lipid
+  metabolism, platelet activation, and endothelial function
+
+Related figures/tables:
+- Figure 2C: Key diet-responsive plasma DEPs and atherosclerosis-related
+  pathways
+- May also support Figure 3B and supplementary ASCVD-related visualizations
+
+Expected outputs:
+- Protein-by-meal heatmaps
+- Pathway annotation heatmaps
+- Summary plots of fold changes, adjusted P values, or AUC values
+
+Input data:
+- Differentially expressed protein results
+- Log2 fold-change or AUC matrices
+- ASCVD-related pathway annotations
+
+
+----------------------------------------------------------------------
+14. 12previous studies_dotline.R
+----------------------------------------------------------------------
+
+Primary purpose:
+Visualization and comparison of findings from previous dietary and proteomic
+studies.
+
+Related analyses:
+- Literature-based comparison of proteins or pathways previously associated with
+  ketogenic, low-fat, high-fat, high-glucose, or other dietary interventions
+- Dot-line plots or related visualizations summarizing previously reported
+  findings
+- Comparison of the current study with prior evidence
+
+Related manuscript content:
+- Contextual comparison of the current acute proteomic findings with previous
+  literature
+- Supporting analyses discussed in the Introduction and Discussion
+
+Related figures/tables:
+- Supplementary literature-comparison figures, where applicable.
+- Any supplementary dot-line plot derived from previously published studies.
+
+Expected outputs:
+- Literature-comparison dot-line plots
+- Summary of previously reported proteins or pathways
+- Annotated comparison datasets
+
+Input data:
+- Curated results from previous studies
+- Protein and pathway annotations
+- Direction and magnitude of previously reported effects
+
+
+----------------------------------------------------------------------
+15. 13new studies_dotline.R
+----------------------------------------------------------------------
+
+Primary purpose:
+Visualization of the findings generated in the current study using dot-line
+plots or related summary plots.
+
+Related analyses:
+- Visualization of newly identified diet-responsive proteins
+- Comparison of protein responses across meals and postprandial time points
+- Display of the direction, magnitude, and statistical significance of current
+  study findings
+
+Related manuscript content:
+- Summary of novel acute proteomic responses identified in the present study
+- Support for the interpretation of meal-specific molecular signatures
+
+Related figures/tables:
+- Supplementary dot-line plots, where applicable.
+- May support Figures 1–2 or related supplementary visualizations depending on
+  the final figure layout.
+
+Expected outputs:
+- Current-study dot-line plots
+- Protein-by-diet response summaries
+- Time-course visualizations
+
+Input data:
+- Current-study differential protein results
+- Log2 fold-change estimates
+- FDR-adjusted P values
+- Diet and time-point information
+
+
+----------------------------------------------------------------------
+16. 14urine_pathway.R
+----------------------------------------------------------------------
+
+Primary purpose:
+Exploratory pathway analysis of postprandial urinary proteomic responses and
+comparison of urinary and plasma pathway-level findings.
+
+Related analyses:
+- Identification of urinary differentially expressed proteins
+- Functional enrichment analysis of urinary protein changes
+- Comparison of biological pathways enriched in urine and plasma
+- Identification of meal-specific urinary responses
+- Assessment of pathways related to oxidative stress and inflammation
+
+Related manuscript content:
+- Exploratory urinary proteomic analyses
+- Urinary pathway responses following:
+  - HFHC meal
+  - High-glucose challenge/OGTT
+  - Ketogenic meal
+  - LFLC meal
+- Shared or complementary pathway responses between plasma and urine
+- Examples include:
+  - Hydrogen peroxide catabolism
+  - Cellular oxidant detoxification
+  - Inflammatory responses
+  - Antioxidant responses
+
+Related figures/tables:
+- Figure 5A: Pathways jointly or uniquely enriched in urine and plasma after
+  the HFHC meal
+- Figure 5B: Pathways jointly or uniquely enriched in urine and plasma after
+  the high-glucose challenge
+- Figure 5C: Urinary differentially expressed proteins across meal challenges
+- Supplementary Figures S5A–B, where applicable
+- Supplementary urinary protein/pathway tables, where applicable
+
+Expected outputs:
+- Urinary differentially expressed protein lists
+- Urinary pathway enrichment results
+- Urine–plasma pathway comparison plots
+- Heatmaps and dot plots of urinary protein responses
+
+Input data:
+- Batch-corrected urine proteomic data
+- Urinary differential protein results
+- Plasma pathway results
+- Protein-to-gene annotations
+- Diet and time-point metadata
+
+
+----------------------------------------------------------------------
+Relationship between scripts and manuscript outputs
+----------------------------------------------------------------------
+
+The scripts contribute to the manuscript outputs as follows:
+
+Main Figure 1:
+- 5.2lgFC_combat_data.R
+- 5combat.R
+- 8GEE.R
+- Supporting quality-control scripts:
+  1diet_pool_CV.R
+  2diet_batch_CV.R
+  3diet_TR_CV.R
+  6UMAP.R
+
+Main Figure 2:
+- 5.2lgFC_combat_data.R
+- 8GEE.R
+- 10pathway.R
+- 11ASCVDheatmap.R
+- 7mfuzz_lgFC.R, where temporal clustering is displayed
+
+Main Figure 3:
+- 8GEE.R for postprandial TGM2 changes
+- 5.2lgFC_combat_data.R for fold-change calculation
+- MR results and plots generated from the relevant analysis workflow
+  associated with the diet-responsive protein and CAD analysis
+
+Main Figure 4:
+- 9Base_CAP.R for baseline phenotype and CAP-related analyses
+- 8GEE.R for protein-level statistical results
+- 5.2lgFC_combat_data.R for postprandial changes and correlations
+
+Main Figure 5:
+- 14urine_pathway.R
+- 5.2lgFC_combat_data.R
+- 8GEE.R for urinary differential protein results
+- 10pathway.R, where shared pathway enrichment procedures are used
+
+Supplementary Figure S1:
+- 1diet_pool_CV.R
+- 2diet_batch_CV.R
+- 3diet_TR_CV.R
+- 5combat.R
+- 6UMAP.R
+- 4Merge_ratio_step1.R
+- 4Merge_ratio_step2.R
+
+Supplementary Figure S2:
+- 10pathway.R
+- 11ASCVDheatmap.R
+- 7mfuzz_lgFC.R, where applicable
+
+Supplementary Figure S3:
+- MR sensitivity-analysis workflow associated with the TGM2–CAD analysis,
+  including leave-one-out, funnel plot, heterogeneity, and pleiotropy
+  assessments
+
+Supplementary Figure S4:
+- 9Base_CAP.R
+- 8GEE.R
+- 5.2lgFC_combat_data.R
+
+Supplementary Figure S5:
+- 14urine_pathway.R
+- 10pathway.R, where plasma–urine pathway comparisons are performed
+
+Supplementary Tables S2–S6:
+- 8GEE.R
+- 5.2lgFC_combat_data.R
+- 4Merge_ratio_step1.R
+- 4Merge_ratio_step2.R
+
+Supplementary Table S7:
+- Mendelian randomization analysis workflow for diet-responsive proteins and
+  coronary artery disease, including sensitivity analyses
+
+
+----------------------------------------------------------------------
+Important reproducibility notes
+----------------------------------------------------------------------
+
+1. The scripts should be executed in the order of data preparation, quality
+   control, batch correction, statistical analysis, pathway analysis, and
+   visualization.
+
+2. The expected order of analysis is:
+
+   a. 1diet_pool_CV.R
+   b. 2diet_batch_CV.R
+   c. 3diet_TR_CV.R
+   d. 4Merge_ratio_step1.R
+   e. 4Merge_ratio_step2.R
+   f. 5combat.R
+   g. 5.2lgFC_combat_data.R
+   h. 6UMAP.R
+   i. 7mfuzz_lgFC.R
+   j. 8GEE.R
+   k. 9Base_CAP.R
+   l. 10pathway.R
+   m. 11ASCVDheatmap.R
+   n. 12previous studies_dotline.R
+   o. 13new studies_dotline.R
+   p. 14urine_pathway.R
+
+3. The exact order may vary depending on the input data and whether an analysis
+   is being rerun from an intermediate processed dataset.
+
+4. The primary proteomic statistical analyses used proteins detected in more
+   than 80% of samples. Missing values were imputed using a sequential
+   k-nearest-neighbor approach before downstream statistical analysis.
+
+5. Differentially expressed proteins were defined using both:
+   - Benjamini–Hochberg FDR < 0.05
+   - Absolute log2 fold change > 0.26
+
+6. Generalized estimating equations were used to account for repeated
+   measurements within participants in the crossover design.
+
+7. For between-diet comparisons, postprandial log2 fold changes were compared
+   across dietary exposures. The area under the curve of postprandial log2 fold
+   changes was calculated using the trapezoidal rule where indicated.
+
+8. Pathway enrichment analyses used human protein/gene annotations and were
+   performed using the enrichment-analysis workflow described in the
+   manuscript.
+
+9. Urinary proteomic analyses are exploratory. Urinary samples were assigned
+   to approximate postprandial time windows using a predefined nearest-time
+   assignment strategy.
+
+10. Exact input-file names and output-file names may depend on the local
+    directory structure used by the authors. Users attempting to reproduce the
+    analysis should inspect the path and file-name settings at the beginning
+    of each script.
+
+11. The scripts may require installation of R packages and access to the
+    processed proteomics matrices and metadata files deposited in the public
+    repository or data repository associated with the manuscript.
+
+12. The publicly available repository contains the analysis code. The raw
+    proteomics data, spectral library, and protein-level quantification
+    matrices are deposited separately in the iProX repository under accession
+    number IPX0009525002.
+
+
+----------------------------------------------------------------------
+Citation and acknowledgement
+----------------------------------------------------------------------
+
+Users who reuse the data or code should cite the associated research article
+and acknowledge the public data repository according to its data-use
+requirements.
+
+Associated study:
+Proteomic profiling of acute postprandial responses to five single-meal
+challenges and implications for cardiometabolic health.
+
+Data repository:
+iProX, accession number IPX0009525002.
+
+Code repository:
+https://github.com/TZCeciliaZhang/human_diet_proteomics_acute
